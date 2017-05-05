@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">FacesManager</string>
+    <string name="no_camera_permission">Нет разрешений</string>
+    <string name="ok">Разрешения получены</string>
+    <string name="not_ready_message">Не уверен</string>
+    <string name="ready_message">Edthty</string>
+</resources>
