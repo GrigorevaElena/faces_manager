@@ -7,3 +7,8 @@ app/build/*
 build/generated/mockable-android-23.jar
 build/intermediates/dex-cache/cache.xml
 local.properties
+gradle.properties
+gradle/wrapper/gradle-wrapper.jar
+gradle/wrapper/gradle-wrapper.properties
+gradlew
+gradlew.bat
