@@ -11,13 +11,15 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
 
-        Button importFaces = (Button) findViewById(R.id.import_faces_btn);
-        Button makePhotoBtn = (Button) findViewById(R.id.make_photo_btn);
+        Button openPersonListBtn = (Button) findViewById(R.id.person_list_btn);
+        Button addPhotoBtn = (Button) findViewById(R.id.add_photo_btn);
+        Button detectFaceBtn = (Button) findViewById(R.id.detect_face_btn);
 
-        assert importFaces != null;
-        importFaces.setOnClickListener(new View.OnClickListener() {
+        assert openPersonListBtn != null;
+        openPersonListBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), FaceListActivity.class);
@@ -25,11 +27,20 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        assert makePhotoBtn != null;
-        makePhotoBtn.setOnClickListener(new View.OnClickListener() {
+        assert addPhotoBtn != null;
+        addPhotoBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), NewFaceActivity.class);
+                Intent intent = new Intent(getApplicationContext(), LoadFaceActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        assert detectFaceBtn != null;
+        detectFaceBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), DetectFaceActivity.class);
                 startActivity(intent);
             }
         });

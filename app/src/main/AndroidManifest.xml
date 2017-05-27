@@ -24,7 +24,9 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".NewFaceActivity"/>
+        <activity android:name=".DetectFaceActivity"/>
+
+        <activity android:name=".LoadFaceActivity"/>
 
         <meta-data
             android:name="com.google.android.gms.vision.DEPENDENCIES"

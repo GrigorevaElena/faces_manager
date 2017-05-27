@@ -29,7 +29,7 @@ import java.util.List;
 /**
  * Created by админ2 on 04.05.2017.
  */
-public class NewFaceActivity extends AppCompatActivity {
+public class DetectFaceActivity extends AppCompatActivity {
     private ImageView mImageView;
     private SwipeRefreshLayout mSwipeRefreshLayout;
 
