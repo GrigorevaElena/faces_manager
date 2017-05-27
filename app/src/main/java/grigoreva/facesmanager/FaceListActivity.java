@@ -24,5 +24,8 @@ public class FaceListActivity extends AppCompatActivity {
             mFragment = (FaceListFragment) getSupportFragmentManager()
                     .findFragmentByTag(FaceListFragment.class.getCanonicalName());
         }
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setTitle("Ваши контакты");
+        }
     }
 }
