@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -8,26 +7,26 @@
 
     <LinearLayout
         android:id="@+id/btn_container"
-        android:layout_alignParentBottom="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
         android:orientation="horizontal">
 
         <Button
             android:id="@+id/find_owner"
-            android:layout_weight="1"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_weight="1"
             android:background="@android:color/holo_green_dark"
-            android:text="Найти совпадения"/>
+            android:text="Найти совпадения" />
 
         <Button
             android:id="@+id/cancel_face"
-            android:layout_weight="1"
-            android:background="@android:color/holo_red_dark"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:text="Отменить"/>
+            android:layout_weight="1"
+            android:background="@android:color/holo_red_dark"
+            android:text="Отменить" />
 
     </LinearLayout>
 
@@ -35,8 +34,8 @@
         android:id="@+id/face_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@android:color/holo_orange_dark"
         android:layout_above="@+id/btn_container"
-        android:layout_marginBottom="12dp"/>
+        android:layout_marginBottom="12dp"
+        android:background="@android:color/holo_orange_dark" />
 
 </RelativeLayout>
