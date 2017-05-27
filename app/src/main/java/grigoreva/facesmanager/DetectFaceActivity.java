@@ -5,17 +5,12 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Path;
-import android.graphics.Point;
 import android.graphics.PointF;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.DrawableRes;
-import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -23,21 +18,16 @@ import android.util.SparseArray;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.google.android.gms.common.api.Api;
 import com.google.android.gms.vision.Frame;
 import com.google.android.gms.vision.face.Face;
 import com.google.android.gms.vision.face.FaceDetector;
 import com.google.android.gms.vision.face.Landmark;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import grigoreva.facesmanager.bl.FaceUtil;
 import grigoreva.facesmanager.data.greendao.Photo;
 
 /**
@@ -51,7 +41,6 @@ public class DetectFaceActivity extends AppCompatActivity {
     private FaceDetector mFaceDetector;
     private Canvas mCanvas;
     private Paint mRectPaint;
-    private BitmapFactory.Options mOptions;
     private int mCurrentImagePosition;
     private Paint mPointPainter;
 
@@ -74,7 +63,6 @@ public class DetectFaceActivity extends AppCompatActivity {
 
         initDetector();
         createPainters();
-        //createOptions();
 
         setTestImage(R.drawable.test1);
     }
@@ -184,29 +172,11 @@ public class DetectFaceActivity extends AppCompatActivity {
     }
 
     private void setTestImage(@DrawableRes int resId) {
-        mBitmap = null;
-        //http://misseva.ru/uploads/images/lyudi-ochen-raznye.jpg
-        //http://www.cablook.com/wp-content/uploads/2014/10/139.jpg
-       /* URL url = null;
-        try {
-            url = new URL("http://misseva.ru/uploads/images/lyudi-ochen-raznye.jpg");
-            mBitmap = BitmapFactory.decodeStream(url.openConnection().getInputStream());
-        } catch (IOException e) {
-            Toast.makeText(getApplicationContext(), "File not found", Toast.LENGTH_SHORT).show();
-            e.printStackTrace();
-        }*/
-
-        /*mBitmap = BitmapFactory.decodeResource(
+        mBitmap = BitmapFactory.decodeResource(
                 getApplicationContext().getResources(),
-                resId,
-                mOptions);*/
+                resId);
         mImageView.setImageDrawable(new BitmapDrawable(getResources(), mBitmap));
     }
-
-/*    private void createOptions() {
-        mOptions = new BitmapFactory.Options();
-        mOptions.inMutable = true;
-    }*/
 
     private void createFaceBorder() {
         if (mFaceDetector == null || !mFaceDetector.isOperational()) {
@@ -215,6 +185,7 @@ public class DetectFaceActivity extends AppCompatActivity {
         }
         Frame frame = new Frame.Builder().setBitmap(mBitmap).build();
         mFaces = mFaceDetector.detect(frame);
+        showOriginalLandmarks(mFaces );
     }
 
     private void showOriginalLandmarks(@NonNull SparseArray<Face> faces) {
@@ -234,34 +205,11 @@ public class DetectFaceActivity extends AppCompatActivity {
         mImageView.setImageDrawable(new BitmapDrawable(getResources(), tempBitmap));
     }
 
-    enum PointsName {
-        BOTTOM_MOUTH(0), LEFT_CHEEK(1), LEFT_EAR_TIP(2),
-        LEFT_EAR(3), LEFT_EYE(4), LEFT_MOUTH(5),
-        NOSE_BASE(6), RIGHT_CHEEK(7), RIGHT_EAR_TIP(8),
-        RIGHT_EAR(9), RIGHT_EYE(10), RIGHT_MOUTH(11);
-
-        int value;
-
-        PointsName(int i) {
-            value = i;
-        }
-
-        @Nullable
-        public static PointsName fromValue(int val) {
-            for (PointsName name : PointsName.values()) {
-                if (val == name.value) {
-                    return name;
-                }
-            }
-            return null;
-        }
-    }
-
     @NonNull
     private Photo getNormalizeLandmarks(@NonNull Face face) {
         Photo photo = new Photo();
 
-        Map<PointsName, PointF> pointsMap = getLandmarkPointsMap(face);
+        Map<FaceUtil.LandmarkType, PointF> pointsMap = getLandmarkPointsMap(face);
 
         float height = face.getHeight();
         float width = face.getWidth();
@@ -271,19 +219,19 @@ public class DetectFaceActivity extends AppCompatActivity {
             PointF normalPoint = normalization(width, height, k);
             Log.d("FaceDetector", "Normal face height: " + height + " and width: " + width);
             //TODO для нормализации остальных точек вычитаем из них левую нижнюю координату
-            normalPoint = pointsMap.get(PointsName.LEFT_EYE);
+            normalPoint = pointsMap.get(FaceUtil.LandmarkType.LEFT_EYE);
             if (normalPoint != null) {
                 normalPoint = normalization(normalPoint.x - width, normalPoint.y - height, k);
                 photo.setLeftEyesX(normalPoint.x);
                 photo.setLeftEyesY(normalPoint.y);
             }
-            normalPoint = pointsMap.get(PointsName.RIGHT_EYE);
+            normalPoint = pointsMap.get(FaceUtil.LandmarkType.RIGHT_EYE);
             if (normalPoint != null) {
                 normalPoint = normalization(normalPoint.x - width, normalPoint.y - height, k);
                 photo.setRightEyesX(normalPoint.x);
                 photo.setRightEyesY(normalPoint.y);
             }
-            normalPoint = pointsMap.get(PointsName.NOSE_BASE);
+            normalPoint = pointsMap.get(FaceUtil.LandmarkType.NOSE_BASE);
             if (normalPoint != null) {
                 normalPoint = normalization(normalPoint.x - width, normalPoint.y - height, k);
                 photo.setNoiseX(normalPoint.x);
@@ -292,17 +240,17 @@ public class DetectFaceActivity extends AppCompatActivity {
             //TODO и тд
         } else {
             // TODO просто заносим координаты в модель
-            PointF normalPoint = pointsMap.get(PointsName.LEFT_EYE);
+            PointF normalPoint = pointsMap.get(FaceUtil.LandmarkType.LEFT_EYE);
             if (normalPoint != null) {
                 photo.setLeftEyesX(normalPoint.x);
                 photo.setLeftEyesY(normalPoint.y);
             }
-            normalPoint = pointsMap.get(PointsName.RIGHT_EYE);
+            normalPoint = pointsMap.get(FaceUtil.LandmarkType.RIGHT_EYE);
             if (normalPoint != null) {
                 photo.setRightEyesX(normalPoint.x);
                 photo.setRightEyesY(normalPoint.y);
             }
-            normalPoint = pointsMap.get(PointsName.NOSE_BASE);
+            normalPoint = pointsMap.get(FaceUtil.LandmarkType.NOSE_BASE);
             if (normalPoint != null) {
                 photo.setNoiseX(normalPoint.x);
                 photo.setNoiseY(normalPoint.y);
@@ -316,12 +264,12 @@ public class DetectFaceActivity extends AppCompatActivity {
     //хранить с точкой идентификатор лица, в запросе возвращать лица (вложенный, если получится),
     // возвращать с каждым фото список контрольных точек
 
-    private Map<PointsName, PointF> getLandmarkPointsMap(@NonNull Face face) {
-        Map<PointsName, PointF> pointsMap = new HashMap<>(face.getLandmarks().size());
+    private Map<FaceUtil.LandmarkType, PointF> getLandmarkPointsMap(@NonNull Face face) {
+        Map<FaceUtil.LandmarkType, PointF> pointsMap = new HashMap<>(face.getLandmarks().size());
         //TODO оптимизировать в 1 проход ВАЖНО!
         //можно определять, что за точка при парсинге типа
         for (Landmark mark : face.getLandmarks()) {
-            PointsName name = PointsName.fromValue(mark.getType());
+            FaceUtil.LandmarkType name = FaceUtil.LandmarkType.fromValue(mark.getType());
             if (name == null) {
                 continue;
             }

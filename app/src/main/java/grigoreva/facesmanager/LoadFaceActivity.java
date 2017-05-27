@@ -41,7 +41,6 @@ public class LoadFaceActivity extends AppCompatActivity {
         mImageView = (ImageView) findViewById(R.id.loaded_photo_view);
     }
 
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         Bitmap img = null;
@@ -58,5 +57,4 @@ public class LoadFaceActivity extends AppCompatActivity {
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
-
 }
