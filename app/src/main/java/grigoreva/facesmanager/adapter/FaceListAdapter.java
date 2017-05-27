@@ -1,6 +1,5 @@
 package grigoreva.facesmanager.adapter;
 
-import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.ViewHolder;
@@ -14,14 +13,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import grigoreva.facesmanager.R;
-import grigoreva.facesmanager.model.Person;
+import grigoreva.facesmanager.model.PersonViewModel;
 
 /**
  * Created by админ2 on 04.04.2017.
  */
 public class FaceListAdapter extends RecyclerView.Adapter <ViewHolder>{
     @NonNull
-    private List<Person> mData = new ArrayList<Person>();
+    private List<PersonViewModel> mData = new ArrayList<PersonViewModel>();
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -31,7 +30,7 @@ public class FaceListAdapter extends RecyclerView.Adapter <ViewHolder>{
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        Person person = mData.get(position);
+        PersonViewModel person = mData.get(position);
         ViewHolder vh = (ViewHolder) holder;
         vh.mName.setText(person.getName());
         //vh.mPhoto.setImageURI(Uri.parse(person.getPhotoPath()));
@@ -43,12 +42,12 @@ public class FaceListAdapter extends RecyclerView.Adapter <ViewHolder>{
     }
 
     @NonNull
-    public List<Person> getData() {
+    public List<PersonViewModel> getData() {
         return mData;
     }
 
-    public void setData(List<Person> mData) {
-        this.mData = mData != null ? mData : new ArrayList<Person>();
+    public void setData(List<PersonViewModel> mData) {
+        this.mData = mData != null ? mData : new ArrayList<PersonViewModel>();
         notifyDataSetChanged();
     }
 

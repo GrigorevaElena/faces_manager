@@ -7,7 +7,7 @@ import android.support.annotation.Nullable;
 /**
  * Created by админ2 on 04.04.2017.
  */
-public class Person {
+public class PersonViewModel {
     //TODO возможно, будут еще фото
     @NonNull
     private String mPhotoPath;
@@ -84,11 +84,11 @@ public class Person {
         }
     }
 
-    public Person(@NonNull String filePath) {
+    public PersonViewModel(@NonNull String filePath) {
         mPhotoPath = filePath;
     }
 
-    public Person (@NonNull String filePath, String surname, String name) {
+    public PersonViewModel(@NonNull String filePath, String surname, String name) {
         this(filePath);
         mSurname = surname;
         mName = name;

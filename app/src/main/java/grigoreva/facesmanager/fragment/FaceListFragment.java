@@ -14,7 +14,7 @@ import java.util.List;
 
 import grigoreva.facesmanager.R;
 import grigoreva.facesmanager.adapter.FaceListAdapter;
-import grigoreva.facesmanager.model.Person;
+import grigoreva.facesmanager.model.PersonViewModel;
 
 /**
  * Created by админ2 on 04.04.2017.
@@ -42,12 +42,12 @@ public class FaceListFragment extends Fragment {
     }
 
     private void fillInitData() {
-        List<Person> initPersonList = new ArrayList<>();
-        initPersonList.add(new Person("path", "Иванов", "Иван"));
-        initPersonList.add(new Person("path", "Петров", "Петр"));
-        initPersonList.add(new Person("path", "Михайлов", "Михаил"));
-        initPersonList.add(new Person("path", "Викторов", "Виктор"));
-        initPersonList.add(new Person("path", "Алекандрова", "Александра"));
+        List<PersonViewModel> initPersonList = new ArrayList<>();
+        initPersonList.add(new PersonViewModel("path", "Иванов", "Иван"));
+        initPersonList.add(new PersonViewModel("path", "Петров", "Петр"));
+        initPersonList.add(new PersonViewModel("path", "Михайлов", "Михаил"));
+        initPersonList.add(new PersonViewModel("path", "Викторов", "Виктор"));
+        initPersonList.add(new PersonViewModel("path", "Алекандрова", "Александра"));
         mAdapter.setData(initPersonList);
     }
 }
