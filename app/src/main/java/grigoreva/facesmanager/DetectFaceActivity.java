@@ -63,7 +63,6 @@ public class DetectFaceActivity extends AppCompatActivity {
 
         initDetector();
         createPainters();
-
         setTestImage(R.drawable.test1);
     }
 
@@ -145,7 +144,9 @@ public class DetectFaceActivity extends AppCompatActivity {
                 break;
         }
         setTestImage(resId);
-        createFaceBorder();
+        if (!createFaceBorder()) {
+            initTestFace(300, 200);
+        }
     }
 
     @Override
@@ -159,7 +160,42 @@ public class DetectFaceActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        createFaceBorder();
+        createFaceBorder() ;
+    }
+
+    private void initTestFace(float photoWidth, float photoHeight) {
+        mFaces = new SparseArray<>(1);
+        float yawDegrees = 80;//?
+        float rollDegrees = 90;//?
+        Landmark[] landmarks = new Landmark[10];
+        //губы?
+        landmarks[0] = new Landmark(new PointF(90, 40), Landmark.BOTTOM_MOUTH);
+        landmarks[1] = new Landmark(new PointF(40, 80), Landmark.LEFT_MOUTH);
+        landmarks[2] = new Landmark(new PointF(140, 80), Landmark.RIGHT_MOUTH);
+        //нос
+        landmarks[3] = new Landmark(new PointF(90, 100), Landmark.NOSE_BASE);
+        //глаза
+        landmarks[4] = new Landmark(new PointF(35, 150), Landmark.LEFT_EYE);
+        landmarks[5] = new Landmark(new PointF(145, 150), Landmark.RIGHT_EYE);
+        //уши
+        landmarks[6] = new Landmark(new PointF(10, 120), Landmark.LEFT_EAR);
+        landmarks[7] = new Landmark(new PointF(170, 120), Landmark.RIGHT_EAR);
+        //щеки
+        landmarks[8] = new Landmark(new PointF(40, 125), Landmark.LEFT_CHEEK);
+        landmarks[9] = new Landmark(new PointF(140, 125), Landmark.RIGHT_CHEEK);
+
+        Face face = new Face(0,
+                new PointF(10, 10),
+                photoWidth - 50,
+                photoHeight - 30,
+                yawDegrees,
+                rollDegrees,
+                landmarks,
+                20,
+                40,
+                1);
+        mFaces.append(0, face);
+        showOriginalLandmarks(mFaces);
     }
 
     private void initDetector() {
@@ -178,14 +214,15 @@ public class DetectFaceActivity extends AppCompatActivity {
         mImageView.setImageDrawable(new BitmapDrawable(getResources(), mBitmap));
     }
 
-    private void createFaceBorder() {
+    private boolean createFaceBorder() {
         if (mFaceDetector == null || !mFaceDetector.isOperational()) {
             Toast.makeText(getApplicationContext(), "Could not set up the face detector!", Toast.LENGTH_SHORT).show();
-            return;
+            return false;
         }
         Frame frame = new Frame.Builder().setBitmap(mBitmap).build();
         mFaces = mFaceDetector.detect(frame);
         showOriginalLandmarks(mFaces );
+        return true;
     }
 
     private void showOriginalLandmarks(@NonNull SparseArray<Face> faces) {
