@@ -25,11 +25,12 @@ public class PersonPhotoDao extends AbstractDao<PersonPhoto, Long> {
     public static class Properties {
         public final static Property Id = new Property(0, Long.class, "id", true, "_id");
         public final static Property PhotoUrl = new Property(1, String.class, "photoUrl", false, "PHOTO_URL");
-        public final static Property FaceWidth = new Property(2, Float.class, "faceWidth", false, "FACE_WIDTH");
-        public final static Property FaceHeight = new Property(3, Float.class, "faceHeight", false, "FACE_HEIGHT");
-        public final static Property NormalFaceWidth = new Property(4, Float.class, "normalFaceWidth", false, "NORMAL_FACE_WIDTH");
-        public final static Property NormalFaceHeight = new Property(5, Float.class, "normalFaceHeight", false, "NORMAL_FACE_HEIGHT");
-        public final static Property AvgFaceColor = new Property(6, Integer.class, "avgFaceColor", false, "AVG_FACE_COLOR");
+        public final static Property PersonId = new Property(2, Long.class, "personId", false, "PERSON_ID");
+        public final static Property FaceWidth = new Property(3, Float.class, "faceWidth", false, "FACE_WIDTH");
+        public final static Property FaceHeight = new Property(4, Float.class, "faceHeight", false, "FACE_HEIGHT");
+        public final static Property NormalFaceWidth = new Property(5, Float.class, "normalFaceWidth", false, "NORMAL_FACE_WIDTH");
+        public final static Property NormalFaceHeight = new Property(6, Float.class, "normalFaceHeight", false, "NORMAL_FACE_HEIGHT");
+        public final static Property AvgFaceColor = new Property(7, Integer.class, "avgFaceColor", false, "AVG_FACE_COLOR");
     };
 
 
@@ -47,11 +48,12 @@ public class PersonPhotoDao extends AbstractDao<PersonPhoto, Long> {
         db.execSQL("CREATE TABLE " + constraint + "\"PERSON_PHOTO\" (" + //
                 "\"_id\" INTEGER PRIMARY KEY AUTOINCREMENT ," + // 0: id
                 "\"PHOTO_URL\" TEXT," + // 1: photoUrl
-                "\"FACE_WIDTH\" REAL," + // 2: faceWidth
-                "\"FACE_HEIGHT\" REAL," + // 3: faceHeight
-                "\"NORMAL_FACE_WIDTH\" REAL," + // 4: normalFaceWidth
-                "\"NORMAL_FACE_HEIGHT\" REAL," + // 5: normalFaceHeight
-                "\"AVG_FACE_COLOR\" INTEGER);"); // 6: avgFaceColor
+                "\"PERSON_ID\" INTEGER," + // 2: personId
+                "\"FACE_WIDTH\" REAL," + // 3: faceWidth
+                "\"FACE_HEIGHT\" REAL," + // 4: faceHeight
+                "\"NORMAL_FACE_WIDTH\" REAL," + // 5: normalFaceWidth
+                "\"NORMAL_FACE_HEIGHT\" REAL," + // 6: normalFaceHeight
+                "\"AVG_FACE_COLOR\" INTEGER);"); // 7: avgFaceColor
     }
 
     /** Drops the underlying database table. */
@@ -75,29 +77,34 @@ public class PersonPhotoDao extends AbstractDao<PersonPhoto, Long> {
             stmt.bindString(2, photoUrl);
         }
  
+        Long personId = entity.getPersonId();
+        if (personId != null) {
+            stmt.bindLong(3, personId);
+        }
+ 
         Float faceWidth = entity.getFaceWidth();
         if (faceWidth != null) {
-            stmt.bindDouble(3, faceWidth);
+            stmt.bindDouble(4, faceWidth);
         }
  
         Float faceHeight = entity.getFaceHeight();
         if (faceHeight != null) {
-            stmt.bindDouble(4, faceHeight);
+            stmt.bindDouble(5, faceHeight);
         }
  
         Float normalFaceWidth = entity.getNormalFaceWidth();
         if (normalFaceWidth != null) {
-            stmt.bindDouble(5, normalFaceWidth);
+            stmt.bindDouble(6, normalFaceWidth);
         }
  
         Float normalFaceHeight = entity.getNormalFaceHeight();
         if (normalFaceHeight != null) {
-            stmt.bindDouble(6, normalFaceHeight);
+            stmt.bindDouble(7, normalFaceHeight);
         }
  
         Integer avgFaceColor = entity.getAvgFaceColor();
         if (avgFaceColor != null) {
-            stmt.bindLong(7, avgFaceColor);
+            stmt.bindLong(8, avgFaceColor);
         }
     }
 
@@ -113,11 +120,12 @@ public class PersonPhotoDao extends AbstractDao<PersonPhoto, Long> {
         PersonPhoto entity = new PersonPhoto( //
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
             cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // photoUrl
-            cursor.isNull(offset + 2) ? null : cursor.getFloat(offset + 2), // faceWidth
-            cursor.isNull(offset + 3) ? null : cursor.getFloat(offset + 3), // faceHeight
-            cursor.isNull(offset + 4) ? null : cursor.getFloat(offset + 4), // normalFaceWidth
-            cursor.isNull(offset + 5) ? null : cursor.getFloat(offset + 5), // normalFaceHeight
-            cursor.isNull(offset + 6) ? null : cursor.getInt(offset + 6) // avgFaceColor
+            cursor.isNull(offset + 2) ? null : cursor.getLong(offset + 2), // personId
+            cursor.isNull(offset + 3) ? null : cursor.getFloat(offset + 3), // faceWidth
+            cursor.isNull(offset + 4) ? null : cursor.getFloat(offset + 4), // faceHeight
+            cursor.isNull(offset + 5) ? null : cursor.getFloat(offset + 5), // normalFaceWidth
+            cursor.isNull(offset + 6) ? null : cursor.getFloat(offset + 6), // normalFaceHeight
+            cursor.isNull(offset + 7) ? null : cursor.getInt(offset + 7) // avgFaceColor
         );
         return entity;
     }
@@ -127,11 +135,12 @@ public class PersonPhotoDao extends AbstractDao<PersonPhoto, Long> {
     public void readEntity(Cursor cursor, PersonPhoto entity, int offset) {
         entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
         entity.setPhotoUrl(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
-        entity.setFaceWidth(cursor.isNull(offset + 2) ? null : cursor.getFloat(offset + 2));
-        entity.setFaceHeight(cursor.isNull(offset + 3) ? null : cursor.getFloat(offset + 3));
-        entity.setNormalFaceWidth(cursor.isNull(offset + 4) ? null : cursor.getFloat(offset + 4));
-        entity.setNormalFaceHeight(cursor.isNull(offset + 5) ? null : cursor.getFloat(offset + 5));
-        entity.setAvgFaceColor(cursor.isNull(offset + 6) ? null : cursor.getInt(offset + 6));
+        entity.setPersonId(cursor.isNull(offset + 2) ? null : cursor.getLong(offset + 2));
+        entity.setFaceWidth(cursor.isNull(offset + 3) ? null : cursor.getFloat(offset + 3));
+        entity.setFaceHeight(cursor.isNull(offset + 4) ? null : cursor.getFloat(offset + 4));
+        entity.setNormalFaceWidth(cursor.isNull(offset + 5) ? null : cursor.getFloat(offset + 5));
+        entity.setNormalFaceHeight(cursor.isNull(offset + 6) ? null : cursor.getFloat(offset + 6));
+        entity.setAvgFaceColor(cursor.isNull(offset + 7) ? null : cursor.getInt(offset + 7));
      }
     
     /** @inheritdoc */

@@ -23,12 +23,15 @@ import com.google.android.gms.vision.face.Face;
 import com.google.android.gms.vision.face.FaceDetector;
 import com.google.android.gms.vision.face.Landmark;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import grigoreva.facesmanager.bl.FaceUtil;
-import grigoreva.facesmanager.data.greendao.Photo;
+import grigoreva.facesmanager.data.greendao.PersonPhoto;
+import grigoreva.facesmanager.data.greendao.PhotoLandmark;
+import grigoreva.facesmanager.data.greendao.customtype.LandmarkType;
 
 /**
  * Created by админ2 on 04.05.2017.
@@ -145,7 +148,8 @@ public class DetectFaceActivity extends AppCompatActivity {
         }
         setTestImage(resId);
         if (!createFaceBorder()) {
-            initTestFace(300, 200);
+            initTestFace(mBitmap.getWidth(), mBitmap.getHeight());
+
         }
     }
 
@@ -164,37 +168,7 @@ public class DetectFaceActivity extends AppCompatActivity {
     }
 
     private void initTestFace(float photoWidth, float photoHeight) {
-        mFaces = new SparseArray<>(1);
-        float yawDegrees = 80;//?
-        float rollDegrees = 90;//?
-        Landmark[] landmarks = new Landmark[10];
-        //губы?
-        landmarks[0] = new Landmark(new PointF(90, 40), Landmark.BOTTOM_MOUTH);
-        landmarks[1] = new Landmark(new PointF(40, 80), Landmark.LEFT_MOUTH);
-        landmarks[2] = new Landmark(new PointF(140, 80), Landmark.RIGHT_MOUTH);
-        //нос
-        landmarks[3] = new Landmark(new PointF(90, 100), Landmark.NOSE_BASE);
-        //глаза
-        landmarks[4] = new Landmark(new PointF(35, 150), Landmark.LEFT_EYE);
-        landmarks[5] = new Landmark(new PointF(145, 150), Landmark.RIGHT_EYE);
-        //уши
-        landmarks[6] = new Landmark(new PointF(10, 120), Landmark.LEFT_EAR);
-        landmarks[7] = new Landmark(new PointF(170, 120), Landmark.RIGHT_EAR);
-        //щеки
-        landmarks[8] = new Landmark(new PointF(40, 125), Landmark.LEFT_CHEEK);
-        landmarks[9] = new Landmark(new PointF(140, 125), Landmark.RIGHT_CHEEK);
-
-        Face face = new Face(0,
-                new PointF(10, 10),
-                photoWidth - 50,
-                photoHeight - 30,
-                yawDegrees,
-                rollDegrees,
-                landmarks,
-                20,
-                40,
-                1);
-        mFaces.append(0, face);
+        mFaces = FaceUtil.getTestFaceList(photoWidth, photoHeight);
         showOriginalLandmarks(mFaces);
     }
 
@@ -242,101 +216,21 @@ public class DetectFaceActivity extends AppCompatActivity {
         mImageView.setImageDrawable(new BitmapDrawable(getResources(), tempBitmap));
     }
 
-    @NonNull
-    private Photo getNormalizeLandmarks(@NonNull Face face) {
-        Photo photo = new Photo();
-
-        Map<FaceUtil.LandmarkType, PointF> pointsMap = getLandmarkPointsMap(face);
-
-        float height = face.getHeight();
-        float width = face.getWidth();
-        Log.d("FaceDetector", "Face height: " + height + " and width: " + width);
-        if (height != 150) {
-            float k = calcK(Math.max(width, height), 150);
-            PointF normalPoint = normalization(width, height, k);
-            Log.d("FaceDetector", "Normal face height: " + height + " and width: " + width);
-            //TODO для нормализации остальных точек вычитаем из них левую нижнюю координату
-            normalPoint = pointsMap.get(FaceUtil.LandmarkType.LEFT_EYE);
-            if (normalPoint != null) {
-                normalPoint = normalization(normalPoint.x - width, normalPoint.y - height, k);
-                photo.setLeftEyesX(normalPoint.x);
-                photo.setLeftEyesY(normalPoint.y);
-            }
-            normalPoint = pointsMap.get(FaceUtil.LandmarkType.RIGHT_EYE);
-            if (normalPoint != null) {
-                normalPoint = normalization(normalPoint.x - width, normalPoint.y - height, k);
-                photo.setRightEyesX(normalPoint.x);
-                photo.setRightEyesY(normalPoint.y);
-            }
-            normalPoint = pointsMap.get(FaceUtil.LandmarkType.NOSE_BASE);
-            if (normalPoint != null) {
-                normalPoint = normalization(normalPoint.x - width, normalPoint.y - height, k);
-                photo.setNoiseX(normalPoint.x);
-                photo.setNoiseY(normalPoint.y);
-            }
-            //TODO и тд
-        } else {
-            // TODO просто заносим координаты в модель
-            PointF normalPoint = pointsMap.get(FaceUtil.LandmarkType.LEFT_EYE);
-            if (normalPoint != null) {
-                photo.setLeftEyesX(normalPoint.x);
-                photo.setLeftEyesY(normalPoint.y);
-            }
-            normalPoint = pointsMap.get(FaceUtil.LandmarkType.RIGHT_EYE);
-            if (normalPoint != null) {
-                photo.setRightEyesX(normalPoint.x);
-                photo.setRightEyesY(normalPoint.y);
-            }
-            normalPoint = pointsMap.get(FaceUtil.LandmarkType.NOSE_BASE);
-            if (normalPoint != null) {
-                photo.setNoiseX(normalPoint.x);
-                photo.setNoiseY(normalPoint.y);
-            }
-        }
-
-        return photo;
-    }
-
-    //TODO можно нормализовать и выводить без объекта - в мапе, хранить в бд тоже списком точек с кастомным типом
-    //хранить с точкой идентификатор лица, в запросе возвращать лица (вложенный, если получится),
-    // возвращать с каждым фото список контрольных точек
-
-    private Map<FaceUtil.LandmarkType, PointF> getLandmarkPointsMap(@NonNull Face face) {
-        Map<FaceUtil.LandmarkType, PointF> pointsMap = new HashMap<>(face.getLandmarks().size());
-        //TODO оптимизировать в 1 проход ВАЖНО!
-        //можно определять, что за точка при парсинге типа
-        for (Landmark mark : face.getLandmarks()) {
-            FaceUtil.LandmarkType name = FaceUtil.LandmarkType.fromValue(mark.getType());
-            if (name == null) {
-                continue;
-            }
-            pointsMap.put(name, new PointF(mark.getPosition().x, mark.getPosition().y));
-        }
-        return pointsMap;
-    }
-
-    private void DrawNormalizeLandmarks(@NonNull Photo photo, @NonNull PointF size) {
+    private void DrawNormalizeLandmarks(@NonNull PersonPhoto photo, @NonNull PointF size) {
         float offset = (float) 5.0;
         Bitmap tempBitmap = Bitmap.createBitmap((int) (size.x + 2 * offset),
                 (int) (size.y + 2 * offset), Bitmap.Config.RGB_565);
         mCanvas = new Canvas(tempBitmap);
         mCanvas.drawRoundRect(new RectF(offset, offset, size.x + offset, size.y + offset), 2, 2, mRectPaint);
 
-        mCanvas.drawPoint(photo.getLeftEyesX(), photo.getLeftEyesY(), mPointPainter);
-        mCanvas.drawPoint(photo.getNoiseX(), photo.getNoiseY(), mPointPainter);
-        mCanvas.drawPoint(photo.getRightEyesX(), photo.getRightEyesY(), mPointPainter);
+        if (photo.getLandmarkList() == null) {
+            return;
+        }
+        for (PhotoLandmark landmark : photo.getLandmarkList()) {
+            mCanvas.drawPoint(landmark.getNormPointX(), landmark.getNormPointY(), mPointPainter);
+        }
 
         mImageView.setImageDrawable(new BitmapDrawable(getResources(), tempBitmap));
-    }
-
-    private float calcK(float height, float normalHeight) {
-        //TODO запретить передавать 0 вторым коэффициентом!
-        return height / normalHeight;
-    }
-
-    private PointF normalization(float width, float height, float k) {
-        return new PointF(width * k, height * k);
-        //по сути вектор из начала координат в верхний правый угол или нормализованное окно, в котором находится лицо
     }
 
     private void showMainFacePoints(Face face) {

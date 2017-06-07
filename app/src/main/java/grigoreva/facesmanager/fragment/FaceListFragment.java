@@ -3,6 +3,8 @@ package grigoreva.facesmanager.fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -14,14 +16,17 @@ import java.util.List;
 
 import grigoreva.facesmanager.R;
 import grigoreva.facesmanager.adapter.FaceListAdapter;
+import grigoreva.facesmanager.data.loader.PersonListLoader;
 import grigoreva.facesmanager.model.PersonViewModel;
 
 /**
  * Created by админ2 on 04.04.2017.
  */
-public class FaceListFragment extends Fragment {
+public class FaceListFragment extends Fragment implements
+        LoaderManager.LoaderCallbacks<List<PersonViewModel>>{
 
     private FaceListAdapter mAdapter;
+    private Loader<List<PersonViewModel>> mLoader;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -38,7 +43,12 @@ public class FaceListFragment extends Fragment {
         listView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
         listView.setAdapter(mAdapter);
         fillInitData();
+        initDataLoader();
         return view;
+    }
+
+    private void initDataLoader() {
+        mLoader = getLoaderManager().initLoader(R.id.person_list_loader, null, this);
     }
 
     private void fillInitData() {
@@ -49,5 +59,23 @@ public class FaceListFragment extends Fragment {
         initPersonList.add(new PersonViewModel("path", "Викторов", "Виктор"));
         initPersonList.add(new PersonViewModel("path", "Алекандрова", "Александра"));
         mAdapter.setData(initPersonList);
+    }
+
+    @Override
+    public Loader<List<PersonViewModel>> onCreateLoader(int id, Bundle args) {
+        if (id == R.id.person_list_loader) {
+            mLoader = new PersonListLoader(getContext());
+        }
+        return mLoader;
+    }
+
+    @Override
+    public void onLoadFinished(Loader<List<PersonViewModel>> loader, List<PersonViewModel> data) {
+        mAdapter.setData(data);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<List<PersonViewModel>> loader) {
+
     }
 }

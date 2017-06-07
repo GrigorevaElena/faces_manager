@@ -18,6 +18,7 @@ public class FacesManagerDaoGenerator {
         Entity personEntity = createPersonEntity(schema);
         Entity photoEntity = createPersonPhotoEntity(schema);
         Entity landmarkEntity = createPhotoLandmarkEntity(schema);
+        schema.enableKeepSectionsByDefault();
 
         new DaoGenerator().generateAll(schema, DESTINATION_FOLDER);
     }
@@ -38,6 +39,7 @@ public class FacesManagerDaoGenerator {
 
         personPhotoEntity.addIdProperty().primaryKey().autoincrement();
         personPhotoEntity.addStringProperty("photoUrl");
+        personPhotoEntity.addLongProperty("personId");
         //параметры прямоугольника, в которое вписываем лицо
         personPhotoEntity.addFloatProperty("faceWidth");
         personPhotoEntity.addFloatProperty("faceHeight");
@@ -54,7 +56,9 @@ public class FacesManagerDaoGenerator {
         Entity photoLandmarkEntity = schema.addEntity("PhotoLandmark");
 
         photoLandmarkEntity.addIdProperty().primaryKey().autoincrement();
-        photoLandmarkEntity.addStringProperty("landmarkType");
+        photoLandmarkEntity.addIntProperty("landmarkType")
+                .customType(PACKAGE_DESTINATION + "customtype.LandmarkType",
+                        PACKAGE_DESTINATION + "customtype.LandmarkTypeConverter");
         photoLandmarkEntity.addLongProperty("photoId");//связь по первичному ключу
         photoLandmarkEntity.addFloatProperty("pointX");
         photoLandmarkEntity.addFloatProperty("pointY");
