@@ -9,11 +9,6 @@
         style="@style/FMBaseStyle"
         android:orientation="vertical">
 
-        <Button
-            android:id="@+id/select_photo_btn"
-            style="@style/FMButtonStyle"
-            android:text="Выбрать фото" />
-
         <ImageView
             android:id="@+id/loaded_photo_view"
             android:layout_width="wrap_content"
@@ -22,6 +17,12 @@
             android:layout_margin="12dp"
             android:scaleType="fitCenter"
             android:src="@android:drawable/ic_menu_camera" />
+
+        <Button
+            android:id="@+id/photo_action_btn"
+            style="@style/FMButtonStyle"
+            android:visibility="gone"
+            android:text="Далее" />
 
     </LinearLayout>
 

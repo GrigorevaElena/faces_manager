@@ -63,7 +63,6 @@ public class DetectFaceActivity extends AppCompatActivity {
             }
         });
 
-
         initDetector();
         createPainters();
         setTestImage(R.drawable.test1);
@@ -226,7 +225,7 @@ public class DetectFaceActivity extends AppCompatActivity {
         if (photo.getLandmarkList() == null) {
             return;
         }
-        for (PhotoLandmark landmark : photo.getLandmarkList()) {
+        for (PhotoLandmark landmark : photo.getLandmarkList().values()) {
             mCanvas.drawPoint(landmark.getNormPointX(), landmark.getNormPointY(), mPointPainter);
         }
 

@@ -17,7 +17,8 @@
             android:scaleType="fitCenter"
             android:src="@drawable/best_face1" />
 
-        <ImageView
+        <!--
+       <ImageView
             android:id="@+id/normalize_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -26,6 +27,7 @@
             android:maxHeight="200dp"
             android:scaleType="fitCenter"
             android:src="@drawable/best_real_face_woman" />
+            -->
 
     </RelativeLayout>
 

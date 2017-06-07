@@ -5,6 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -68,11 +69,11 @@ public class DatabaseDelegate {
     }
 
     public long savePhoto(PersonPhoto photo) {
-        savePhotoLandmarkList(photo.getLandmarkList());
+        savePhotoLandmarkList(photo.getLandmarkList().values());
         return mPhotoDao.insertOrReplace(photo);
     }
 
-    private void savePhotoLandmarkList(List<PhotoLandmark> landmarkList) {
+    private void savePhotoLandmarkList(Collection<PhotoLandmark> landmarkList) {
         if (landmarkList == null || landmarkList.isEmpty()) {
             return;
         }

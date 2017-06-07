@@ -57,8 +57,8 @@ public class FacesManagerDaoGenerator {
 
         photoLandmarkEntity.addIdProperty().primaryKey().autoincrement();
         photoLandmarkEntity.addIntProperty("landmarkType")
-                .customType(PACKAGE_DESTINATION + "customtype.LandmarkType",
-                        PACKAGE_DESTINATION + "customtype.LandmarkTypeConverter");
+                .customType(PACKAGE_DESTINATION + ".customtype.LandmarkType",
+                        PACKAGE_DESTINATION + ".customtype.LandmarkTypeConverter");
         photoLandmarkEntity.addLongProperty("photoId");//связь по первичному ключу
         photoLandmarkEntity.addFloatProperty("pointX");
         photoLandmarkEntity.addFloatProperty("pointY");

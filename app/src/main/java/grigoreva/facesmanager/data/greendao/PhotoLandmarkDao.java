@@ -8,8 +8,8 @@ import de.greenrobot.dao.AbstractDao;
 import de.greenrobot.dao.Property;
 import de.greenrobot.dao.internal.DaoConfig;
 
-import grigoreva.facesmanager.data.greendaocustomtype.LandmarkType;
-import grigoreva.facesmanager.data.greendaocustomtype.LandmarkTypeConverter;
+import grigoreva.facesmanager.data.greendao.customtype.LandmarkType;
+import grigoreva.facesmanager.data.greendao.customtype.LandmarkTypeConverter;
 
 import grigoreva.facesmanager.data.greendao.PhotoLandmark;
 
