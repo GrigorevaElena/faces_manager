@@ -18,6 +18,14 @@
             android:scaleType="fitCenter"
             android:src="@android:drawable/ic_menu_camera" />
 
+        <ImageView
+            android:id="@+id/norm_image_view"
+            android:layout_gravity="center"
+            android:layout_margin="12dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxHeight="300dp"/>
+
         <Button
             android:id="@+id/photo_action_btn"
             style="@style/FMButtonStyle"

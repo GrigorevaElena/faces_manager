@@ -1,10 +1,8 @@
 package grigoreva.facesmanager.bl;
 
 import android.graphics.PointF;
-import android.media.FaceDetector;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.util.SparseArray;
 
 import com.google.android.gms.vision.face.Face;
@@ -24,9 +22,10 @@ import grigoreva.facesmanager.data.greendao.customtype.LandmarkType;
  */
 public class FaceUtil {
 
-    private static final float MAX_DIFF_VALUE = 10.0f;
+    private static final float MAX_DIFF_VALUE = 5.0f;
     private static final float MIN_DIFF_X = 2.0f;
     private static final float MIN_DIFF_Y = MIN_DIFF_X;
+    public static final int NORMAL_HEIGHT = 300;
 
     public static List<PersonPhoto> parseFacesModelList(@Nullable SparseArray<Face> faces) {
         if (faces == null || faces.size() == 0) {
@@ -118,28 +117,33 @@ public class FaceUtil {
         float height = face.getHeight();
         float width = face.getWidth();
 
+        photo.setFaceWidth(width);
+        photo.setFaceHeight(height);
+
         Map<LandmarkType, PhotoLandmark> landmarks = new HashMap<>();
 
-        Log.d("FaceDetector", "Face height: " + height + " and width: " + width);
-        if (height != 150) {
-            float k = calcK(Math.max(width, height), 150);
-            Log.d("FaceDetector", "Normal face height: " + height + " and width: " + width);
+        if (height != NORMAL_HEIGHT) {
+            float k = calcK(Math.max(width, height), NORMAL_HEIGHT);
+            photo.setNormalFaceWidth(width / k);
+            photo.setNormalFaceHeight(height / k);
             //TODO для нормализации остальных точек вычитаем из них левую нижнюю координату
             for (Landmark mark : face.getLandmarks()) {
                 LandmarkType name = LandmarkType.fromValue(mark.getType());
                 if (name == null) {
                     continue;
                 }
-                    landmarks.put(name, getPoint(mark.getPosition(), width, height, k));
+                landmarks.put(name, getPoint(name, mark.getPosition(), face.getPosition().x, face.getPosition().y, k));
             }
         } else {
+            photo.setNormalFaceWidth(width);
+            photo.setNormalFaceHeight(height);
             // TODO просто заносим координаты в модель
             for (Landmark mark : face.getLandmarks()) {
                 LandmarkType name = LandmarkType.fromValue(mark.getType());
                 if (name == null) {
                     continue;
                 }
-                    landmarks.put(name, getPoint(mark.getPosition()));
+                landmarks.put(name, getPoint(name, mark.getPosition()));
             }
         }
         photo.setLandmarkList(landmarks);
@@ -148,17 +152,20 @@ public class FaceUtil {
     }
 
     private static float calcK(float height, float normalHeight) {
-        //TODO запретить передавать 0 вторым коэффициентом!
+        if (normalHeight == 0) {
+            return height;
+        }
         return height / normalHeight;
     }
 
     private static PointF normalization(float width, float height, float k) {
-        return new PointF(width * k, height * k);
+        return new PointF(width / k, height / k);
         //по сути вектор из начала координат в верхний правый угол или нормализованное окно, в котором находится лицо
     }
 
-    private static PhotoLandmark getPoint(@NonNull PointF normalPoint, float normalWidth, float normalHeight, float k) {
+    private static PhotoLandmark getPoint(@NonNull LandmarkType type, @NonNull PointF normalPoint, float normalWidth, float normalHeight, float k) {
         PhotoLandmark landmark = new PhotoLandmark();
+        landmark.setLandmarkType(type);
         landmark.setPointX(normalPoint.x);
         landmark.setPointY(normalPoint.y);
         normalPoint = normalization(normalPoint.x - normalWidth, normalPoint.y - normalHeight, k);
@@ -167,8 +174,9 @@ public class FaceUtil {
         return landmark;
     }
 
-    private static PhotoLandmark getPoint(@NonNull PointF normalPoint) {
+    private static PhotoLandmark getPoint(@NonNull LandmarkType type, @NonNull PointF normalPoint) {
         PhotoLandmark landmark = new PhotoLandmark();
+        landmark.setLandmarkType(type);
         landmark.setPointX(normalPoint.x);
         landmark.setPointY(normalPoint.y);
         return landmark;
@@ -192,7 +200,7 @@ public class FaceUtil {
             diffValueX += p1.getNormPointX() - p2.getNormPointX();
             diffValueY += p1.getNormPointY() - p2.getNormPointY();
         }
-        p1 = landmarkList.get(LandmarkType.LEFT_MOUTH);
+       /* p1 = landmarkList.get(LandmarkType.LEFT_MOUTH);
         p2 = landmarkList1.get(LandmarkType.LEFT_MOUTH);
         if (!comparePoint(p1, p2)) {
             diffValueX += p1.getNormPointX() - p2.getNormPointX();
@@ -203,7 +211,7 @@ public class FaceUtil {
         if (!comparePoint(p1, p2)) {
             diffValueX += p1.getNormPointX() - p2.getNormPointX();
             diffValueY += p1.getNormPointY() - p2.getNormPointY();
-        }
+        }*/
         p1 = landmarkList.get(LandmarkType.LEFT_EYE);
         p2 = landmarkList1.get(LandmarkType.LEFT_EYE);
         if (!comparePoint(p1, p2)) {
@@ -250,5 +258,14 @@ public class FaceUtil {
             return true;
         }
         return false;
+    }
+
+    public static PersonPhoto findFace(List<PersonPhoto> personPhotos, PersonPhoto photo) {
+        for(PersonPhoto personPhoto : personPhotos) {
+            if (compareModels(photo, personPhoto)) {
+                return personPhoto;
+            }
+        }
+        return null;
     }
 }

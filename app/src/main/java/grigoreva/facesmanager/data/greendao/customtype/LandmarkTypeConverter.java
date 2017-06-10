@@ -8,10 +8,7 @@ import de.greenrobot.dao.converter.PropertyConverter;
 public class LandmarkTypeConverter implements PropertyConverter<LandmarkType, Integer> {
     @Override
     public LandmarkType convertToEntityProperty(Integer databaseValue) {
-        if (databaseValue == null) {
-            return null;
-        }
-        return LandmarkType.fromValue(databaseValue);
+        return databaseValue == null ? null : LandmarkType.fromValue(databaseValue);
     }
 
     @Override
