@@ -3,5 +3,12 @@
     <string name="no_camera_permission">Нет разрешений</string>
     <string name="ok">Разрешения получены</string>
     <string name="not_ready_message">Не уверен</string>
-    <string name="ready_message">Edthty</string>
+    <string name="ready_message">Уверен</string>
+
+    <string name="add_person_to_list">Добавить</string>
+    <string name="import_contact">Импортировать контакты</string>
+    <string name="input_surname">Введите Фамилию:</string>
+    <string name="input_name">Введите имя:</string>
+    <string name="add_new_person_title">Новая персона</string>
+    <string name="cancel">Отмена</string>
 </resources>

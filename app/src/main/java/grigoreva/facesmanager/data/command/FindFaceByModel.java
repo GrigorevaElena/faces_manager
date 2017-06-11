@@ -39,8 +39,9 @@ public class FindFaceByModel implements Runnable {
             PersonPhoto photo = FaceUtil.findFace(personPhotos, mPhoto);
             if (photo != null) {
                 EventBus.getDefault().post(new FaceWasFoundEvent(databaseDelegate.getPersonById(photo.getPersonId())));
+            } else {
+                EventBus.getDefault().post(new FaceWasFoundEvent(null));
             }
-            EventBus.getDefault().post(new FaceWasFoundEvent(null));
         }
     }
 }

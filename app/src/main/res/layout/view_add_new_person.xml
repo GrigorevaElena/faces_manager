@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/FMBaseStyle"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TextView
+        style="@style/FMTextViewStyle"
+        android:text="@string/input_surname" />
+
+    <EditText
+        android:id="@+id/add_surname_edit_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        android:maxLines="2"
+        android:textColor="@android:color/black"
+        android:textSize="20sp"
+        tools:text="Григорьева" />
+
+    <TextView
+        style="@style/FMTextViewStyle"
+        android:text="@string/input_name" />
+
+    <EditText
+        android:id="@+id/add_name_edit_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        android:maxLines="2"
+        android:textSize="20sp"
+        tools:text="Елена" />
+
+    <CheckBox
+        android:id="@+id/add_is_contact_check_box"
+        style="@style/FMTextViewStyle"
+        android:text="@string/import_contact" />
+</LinearLayout>

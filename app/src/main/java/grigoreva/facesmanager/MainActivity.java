@@ -31,7 +31,8 @@ public class MainActivity extends AppCompatActivity {
         addPhotoBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), LoadFaceActivity.class);
+                Intent intent = new Intent(getApplicationContext(), DetectFaceActivity.class);
+                intent.putExtra(DetectFaceActivity.ADD_NEW, true);
                 startActivity(intent);
             }
         });

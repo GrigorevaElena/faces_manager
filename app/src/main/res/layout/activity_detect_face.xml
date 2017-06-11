@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:fb="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/white">
@@ -20,17 +19,19 @@
 
         <ImageView
             android:id="@+id/norm_image_view"
-            android:layout_gravity="center"
-            android:layout_margin="12dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:maxHeight="300dp"/>
+            android:layout_gravity="center"
+            android:layout_margin="12dp"
+            android:maxHeight="300dp" />
 
         <Button
             android:id="@+id/photo_action_btn"
             style="@style/FMButtonStyle"
-            android:visibility="gone"
-            android:text="Далее" />
+            android:text="Далее"
+            android:visibility="gone" />
+
+        <include layout="@layout/item_face_data" />
 
     </LinearLayout>
 
