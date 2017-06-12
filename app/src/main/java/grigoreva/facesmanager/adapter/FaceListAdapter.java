@@ -19,8 +19,9 @@ import grigoreva.facesmanager.model.PersonViewModel;
  * Created by админ2 on 04.04.2017.
  */
 public class FaceListAdapter extends RecyclerView.Adapter <ViewHolder>{
+
     @NonNull
-    private List<PersonViewModel> mData = new ArrayList<PersonViewModel>();
+    private List<PersonViewModel> mData = new ArrayList<>();
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -33,7 +34,10 @@ public class FaceListAdapter extends RecyclerView.Adapter <ViewHolder>{
         PersonViewModel person = mData.get(position);
         ViewHolder vh = (ViewHolder) holder;
         vh.mName.setText(person.getName());
-        //vh.mPhoto.setImageURI(Uri.parse(person.getPhotoPath()));
+        vh.mIsContact.setText(person.getIsContact() ? "Друг" : "Новое лицо");
+        if (person.getBitmap() != null) {
+            vh.mPhoto.setImageBitmap(person.getBitmap());
+        }
     }
 
     @Override
@@ -54,11 +58,13 @@ public class FaceListAdapter extends RecyclerView.Adapter <ViewHolder>{
     class ViewHolder extends RecyclerView.ViewHolder {
         TextView mName;
         ImageView mPhoto;
+        TextView mIsContact;
 
         public ViewHolder(View itemView) {
             super(itemView);
             mName = (TextView) itemView.findViewById(R.id.name);
             mPhoto = (ImageView) itemView.findViewById(R.id.main_photo);
+            mIsContact = (TextView) itemView.findViewById(R.id.status);
         }
     }
 }

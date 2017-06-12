@@ -32,7 +32,7 @@ public class PersonListLoader extends AsyncTaskLoader<List<PersonViewModel>> {
             PersonPhoto personPhoto = databaseDelegate.getMainPersonPhoto(person.getId());
             personViewModelList.add(
                     new PersonViewModel(personPhoto == null ? "" : personPhoto.getPhotoUrl(),
-                    person.getSurname(), person.getName()));
+                    person.getSurname(), person.getName(), person.getIsContact()));
         }
         return personViewModelList;
     }

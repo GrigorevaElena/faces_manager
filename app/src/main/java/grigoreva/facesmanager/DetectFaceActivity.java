@@ -1,6 +1,7 @@
 package grigoreva.facesmanager;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -18,6 +19,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.vision.Frame;
@@ -76,6 +78,7 @@ public class DetectFaceActivity extends AppCompatActivity implements
     private PersonPhoto mPhoto;
     private Person mPerson;
     private Uri mSelectedImage;
+    private TextView mFoundPersonName;
 
     private enum ProcessingState {
         START(0), PHOTO_LOADED(1), LANDMARKS_FOUND(2),
@@ -123,6 +126,7 @@ public class DetectFaceActivity extends AppCompatActivity implements
             }
         });
         mFoundFaceView = (RelativeLayout) findViewById(R.id.face_data_container);
+        mFoundPersonName = (TextView) findViewById(R.id.name);
         assert mFoundFaceView != null;
         mFoundFaceView.setVisibility(View.GONE);
         mIsAddNewPersonMode = getIntent().getBooleanExtra(ADD_NEW, false);
@@ -148,7 +152,7 @@ public class DetectFaceActivity extends AppCompatActivity implements
         Person person = new Person();
         person.setName(name);
         person.setSurname(surname);
-        person.setIsContact(true);
+        person.setIsContact(isContact);
         if (mService == null) {
             mService = Executors.newFixedThreadPool(3);
         }
@@ -208,6 +212,7 @@ public class DetectFaceActivity extends AppCompatActivity implements
     private void showMoreInfoAboutPerson() {
         // Отобразить после нажатия на кнопку (под ней) вью с подробной информацией о персоне
         //...
+        mFoundPersonName.setText(String.format("%s %s", mPerson.getSurname(), mPerson.getName()));
         mFoundFaceView.setVisibility(View.VISIBLE);
     }
 
@@ -264,7 +269,7 @@ public class DetectFaceActivity extends AppCompatActivity implements
         //...
         mPhoto = FaceUtil.getNormalizeLandmarks(mFaces.valueAt(0));
         //todo
-        mPhoto.setPhotoUrl(mSelectedImage.toString());
+        mPhoto.setPhotoUrl(getRealPathFromURI(mSelectedImage));
         Bitmap tempBitmap = Bitmap.createBitmap(mPhoto.getNormalFaceWidth().intValue(),
                 mPhoto.getNormalFaceHeight().intValue(), Bitmap.Config.RGB_565);
         mNormCanvas = new Canvas(tempBitmap);
@@ -317,7 +322,6 @@ public class DetectFaceActivity extends AppCompatActivity implements
             mSelectedImage = data.getData();
             try {
                 mImage = MediaStore.Images.Media.getBitmap(getContentResolver(), mSelectedImage);
-
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -328,6 +332,20 @@ public class DetectFaceActivity extends AppCompatActivity implements
             actionPerformed(mImage != null);
         }
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private String getRealPathFromURI(Uri contentURI) {
+        String result;
+        Cursor cursor = getContentResolver().query(contentURI, null, null, null, null);
+        if (cursor == null) { // Source is Dropbox or other similar local file path
+            result = contentURI.getPath();
+        } else {
+            cursor.moveToFirst();
+            int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
+            result = cursor.getString(idx);
+            cursor.close();
+        }
+        return result;
     }
 
     private void createPainters() {

@@ -42,9 +42,15 @@ public class FaceListFragment extends Fragment implements
         listView.setHasFixedSize(true);
         listView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
         listView.setAdapter(mAdapter);
-        fillInitData();
+        //fillInitData();
         initDataLoader();
         return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mLoader.forceLoad();
     }
 
     private void initDataLoader() {
@@ -53,11 +59,11 @@ public class FaceListFragment extends Fragment implements
 
     private void fillInitData() {
         List<PersonViewModel> initPersonList = new ArrayList<>();
-        initPersonList.add(new PersonViewModel("path", "Иванов", "Иван"));
-        initPersonList.add(new PersonViewModel("path", "Петров", "Петр"));
-        initPersonList.add(new PersonViewModel("path", "Михайлов", "Михаил"));
-        initPersonList.add(new PersonViewModel("path", "Викторов", "Виктор"));
-        initPersonList.add(new PersonViewModel("path", "Алекандрова", "Александра"));
+        initPersonList.add(new PersonViewModel("path", "Иванов", "Иван", true));
+        initPersonList.add(new PersonViewModel("path", "Петров", "Петр", false));
+        initPersonList.add(new PersonViewModel("path", "Михайлов", "Михаил", true));
+        initPersonList.add(new PersonViewModel("path", "Викторов", "Виктор", true));
+        initPersonList.add(new PersonViewModel("path", "Алекандрова", "Александра", false));
         mAdapter.setData(initPersonList);
     }
 

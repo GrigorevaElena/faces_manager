@@ -200,18 +200,6 @@ public class FaceUtil {
             diffValueX += p1.getNormPointX() - p2.getNormPointX();
             diffValueY += p1.getNormPointY() - p2.getNormPointY();
         }
-       /* p1 = landmarkList.get(LandmarkType.LEFT_MOUTH);
-        p2 = landmarkList1.get(LandmarkType.LEFT_MOUTH);
-        if (!comparePoint(p1, p2)) {
-            diffValueX += p1.getNormPointX() - p2.getNormPointX();
-            diffValueY += p1.getNormPointY() - p2.getNormPointY();
-        }
-        p1 = landmarkList.get(LandmarkType.RIGHT_MOUTH);
-        p2 = landmarkList1.get(LandmarkType.RIGHT_MOUTH);
-        if (!comparePoint(p1, p2)) {
-            diffValueX += p1.getNormPointX() - p2.getNormPointX();
-            diffValueY += p1.getNormPointY() - p2.getNormPointY();
-        }*/
         p1 = landmarkList.get(LandmarkType.LEFT_EYE);
         p2 = landmarkList1.get(LandmarkType.LEFT_EYE);
         if (!comparePoint(p1, p2)) {

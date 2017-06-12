@@ -1,8 +1,11 @@
 package grigoreva.facesmanager.model;
 
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+
+import grigoreva.facesmanager.bl.FileUtils;
 
 /**
  * Created by админ2 on 04.04.2017.
@@ -16,6 +19,8 @@ public class PersonViewModel {
     @Nullable
     private Integer mAge; /*may be unknown*/
     private Gender mGender;
+    private boolean mIsContact;
+    private Bitmap mBitmap;
 
     //TODO сколько координат будут определять точки лица?
     private int mFacePoints[][];
@@ -61,6 +66,18 @@ public class PersonViewModel {
         this.mGender = mGender;
     }
 
+    public boolean getIsContact() {
+        return mIsContact;
+    }
+
+    public void setIsContact(boolean isContact) {
+        mIsContact = isContact;
+    }
+
+    public Bitmap getBitmap() {
+        return mBitmap;
+    }
+
     public enum Gender {
         MALE(0), FEMALE(1), UNKNOWN(-1);
 
@@ -86,11 +103,14 @@ public class PersonViewModel {
 
     public PersonViewModel(@NonNull String filePath) {
         mPhotoPath = filePath;
+        mBitmap = FileUtils.getBitmapByPath(mPhotoPath);
     }
 
-    public PersonViewModel(@NonNull String filePath, String surname, String name) {
+
+    public PersonViewModel(@NonNull String filePath, String surname, String name, boolean isContact) {
         this(filePath);
         mSurname = surname;
         mName = name;
+        mIsContact = isContact;
     }
 }
