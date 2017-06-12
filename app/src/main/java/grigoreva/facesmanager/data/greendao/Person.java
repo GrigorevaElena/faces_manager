@@ -15,6 +15,7 @@ public class Person {
     private boolean isContact;
 
     // KEEP FIELDS - put your custom fields here
+    private String mainPhoto;
     // KEEP FIELDS END
 
     public Person() {
@@ -64,6 +65,14 @@ public class Person {
     }
 
     // KEEP METHODS - put your custom methods here
+
+    public void setMainPhoto(String mainPhoto) {
+        this.mainPhoto = mainPhoto;
+    }
+
+    public String getMainPhoto() {
+        return mainPhoto;
+    }
     // KEEP METHODS END
 
 }

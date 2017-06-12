@@ -34,7 +34,7 @@ public class FaceListAdapter extends RecyclerView.Adapter <ViewHolder>{
         PersonViewModel person = mData.get(position);
         ViewHolder vh = (ViewHolder) holder;
         vh.mName.setText(person.getName());
-        vh.mIsContact.setText(person.getIsContact() ? "Друг" : "Новое лицо");
+        vh.mIsContact.setText(person.getIsContact() ? "Из списка контактов" : "Из приложения");
         if (person.getBitmap() != null) {
             vh.mPhoto.setImageBitmap(person.getBitmap());
         }
@@ -57,12 +57,14 @@ public class FaceListAdapter extends RecyclerView.Adapter <ViewHolder>{
 
     class ViewHolder extends RecyclerView.ViewHolder {
         TextView mName;
+        TextView mAvgColor;
         ImageView mPhoto;
         TextView mIsContact;
 
         public ViewHolder(View itemView) {
             super(itemView);
             mName = (TextView) itemView.findViewById(R.id.name);
+            mAvgColor = (TextView) itemView.findViewById(R.id.color);
             mPhoto = (ImageView) itemView.findViewById(R.id.main_photo);
             mIsContact = (TextView) itemView.findViewById(R.id.status);
         }

@@ -119,4 +119,12 @@ public class DatabaseDelegate {
         }
         return result;
     }
+
+    public List<PersonPhoto> getPhotoByPersonId(Long id) {
+        List<PersonPhoto> photos = mPhotoDao.queryBuilder().where(PersonPhotoDao.Properties.PersonId.eq(id)).list();
+        for (PersonPhoto photo : photos) {
+            photo.setLandmarkList(getLandmarksForPhoto(photo.getId()));
+        }
+        return photos;
+    }
 }

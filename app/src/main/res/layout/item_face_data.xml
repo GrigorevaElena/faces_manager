@@ -29,10 +29,11 @@
             android:textSize="20sp" />
 
         <TextView
-            android:id="@+id/age"
+            android:id="@+id/color"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Возраст: 18 лет"
+            android:visibility="gone"
             android:textSize="15sp" />
 
         <TextView

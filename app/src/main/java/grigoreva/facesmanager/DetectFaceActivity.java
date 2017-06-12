@@ -38,6 +38,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import grigoreva.facesmanager.bl.FaceUtil;
+import grigoreva.facesmanager.bl.FileUtils;
 import grigoreva.facesmanager.data.command.FindFaceByModel;
 import grigoreva.facesmanager.data.command.SaveNewPersonCommand;
 import grigoreva.facesmanager.data.greendao.Person;
@@ -79,6 +80,8 @@ public class DetectFaceActivity extends AppCompatActivity implements
     private Person mPerson;
     private Uri mSelectedImage;
     private TextView mFoundPersonName;
+    private TextView mFoundPersonIsContact;
+    private ImageView mFoundPersonPhoto;
 
     private enum ProcessingState {
         START(0), PHOTO_LOADED(1), LANDMARKS_FOUND(2),
@@ -127,6 +130,8 @@ public class DetectFaceActivity extends AppCompatActivity implements
         });
         mFoundFaceView = (RelativeLayout) findViewById(R.id.face_data_container);
         mFoundPersonName = (TextView) findViewById(R.id.name);
+        mFoundPersonIsContact = (TextView) findViewById(R.id.status);
+        mFoundPersonPhoto = (ImageView) findViewById(R.id.main_photo);
         assert mFoundFaceView != null;
         mFoundFaceView.setVisibility(View.GONE);
         mIsAddNewPersonMode = getIntent().getBooleanExtra(ADD_NEW, false);
@@ -172,15 +177,14 @@ public class DetectFaceActivity extends AppCompatActivity implements
                 normalizeIfNeed();
                 break;
             case NORMALISED:
-                //findAvgColor(); //модификация
+                findAvgColor(); //модификация
+                break;
+            case COLOR_CALCULATED:
                 if (mIsAddNewPersonMode) {
                     addFaceInDB();
                 } else {
                     findFaceInDB();
                 }
-                break;
-            case COLOR_CALCULATED:
-                findFaceInDB();
                 break;
             case FACE_FOUND:
                 showMoreInfoAboutPerson();
@@ -212,13 +216,19 @@ public class DetectFaceActivity extends AppCompatActivity implements
     private void showMoreInfoAboutPerson() {
         // Отобразить после нажатия на кнопку (под ней) вью с подробной информацией о персоне
         //...
-        mFoundPersonName.setText(String.format("%s %s", mPerson.getSurname(), mPerson.getName()));
+        mFoundPersonName.setText(String.format("%s", mPerson.getName()));
+        mFoundPersonIsContact.setText(mPerson.getIsContact() ? "Из списка контактов" : "Из приложения");
+        mFoundPersonPhoto.setImageBitmap(FileUtils.getBitmapByPath(mPerson.getMainPhoto()));
         mFoundFaceView.setVisibility(View.VISIBLE);
     }
 
     private void findFaceInDB() {
         // Запрос к БД по данным составленной модели, в нем же - вызов методов алгоритма из FaceUtils
         // показать прогресс загрузки
+        if (mPhoto.getLandmarkList().values().size() < 8) {
+            Toast.makeText(getApplicationContext(), "Недостаточно точек для поиска", Toast.LENGTH_SHORT).show();
+            return;
+        }
         if (mService == null) {
             mService = Executors.newFixedThreadPool(3);
         }
@@ -226,6 +236,10 @@ public class DetectFaceActivity extends AppCompatActivity implements
     }
 
     private void addFaceInDB() {
+        if (mPhoto.getLandmarkList().values().size() < 8) {
+            Toast.makeText(getApplicationContext(), "Недостаточно точек для формирования модели", Toast.LENGTH_SHORT).show();
+            return;
+        }
         AddPersonDialogFragment dialogFragment = new AddPersonDialogFragment();
         dialogFragment.show(getSupportFragmentManager(), AddPersonDialogFragment.class.getCanonicalName());
     }
@@ -281,29 +295,64 @@ public class DetectFaceActivity extends AppCompatActivity implements
         for (PhotoLandmark mark : mPhoto.getLandmarkList().values()) {
             mNormCanvas.drawPoint(mark.getNormPointX(), mark.getNormPointY(), mPointPainter);
         }
-        mNormalImageView.setImageDrawable(new BitmapDrawable(getResources(), tempBitmap));
+        //mNormalImageView.setImageDrawable(new BitmapDrawable(getResources(), tempBitmap));
         actionPerformed(true);
     }
 
     private void findAvgColor() {
-        //...
-        getAvgColorBackground();
-        //...
+        mPhoto.setAvgFaceColor(getAvgColorBackground());
+        actionPerformed(true);
     }
 
-    private void getAvgColorBackground() {
+    private int getAvgColorBackground() {
         // вычислить тон по RGB цвету
-        //...
         Map<LandmarkType, PhotoLandmark> landmarkMap = mPhoto.getLandmarkList();
         PhotoLandmark leftCheek = landmarkMap.get(LandmarkType.LEFT_CHEEK);
         PhotoLandmark rightCheek = landmarkMap.get(LandmarkType.RIGHT_CHEEK);
-        int pixelLeftCenter = mImage.getPixel(leftCheek.getPointX().intValue(), leftCheek.getPointY().intValue());
-        int pixelRightCenter = mImage.getPixel(leftCheek.getPointX().intValue(), leftCheek.getPointY().intValue());
+        int leftX = leftCheek.getPointX().intValue();
+        int leftY = leftCheek.getPointY().intValue();
+        int rightX = rightCheek.getPointX().intValue();
+        int rightY = rightCheek.getPointY().intValue();
 
-        int redValue = Color.red(pixelLeftCenter);
-        int blueValue = Color.blue(pixelLeftCenter);
-        int greenValue = Color.green(pixelLeftCenter);
+        int avgH = 0;
+
         //todo преобразование к hsb
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                avgH += getHForPixel(mImage.getPixel(leftX + i - 1, leftY + j - 1));
+                avgH += getHForPixel(mImage.getPixel(rightX + i - 1, rightY + j - 1));
+            }
+        }
+        Toast.makeText(getApplicationContext(), "Значение среднего цвета: " + avgH/18, Toast.LENGTH_SHORT).show();
+        return avgH / 18;
+    }
+
+    private int getHForPixel(int pixel) {
+        int redValue = Color.red(pixel);
+        int blueValue = Color.blue(pixel);
+        int greenValue = Color.green(pixel);
+
+        int max = Math.max(Math.max(redValue, blueValue), greenValue);
+        int min = Math.min(Math.min(redValue, blueValue), greenValue);
+
+        if (max == min) {
+            return 0;
+        }
+
+        if (max == redValue && greenValue >= blueValue) {
+            return 60 * (greenValue - blueValue) / (max - min);
+        }
+        else if (max == redValue && greenValue < blueValue) {
+            return 60 * (greenValue - blueValue) / (max - min) + 360;
+        }
+        else if (max == greenValue) {
+            return 60 * (blueValue - redValue) / (max - min) + 120;
+        }
+       else if (max == blueValue) {
+            return 60 * (redValue - greenValue) / (max - min) + 240;
+        }
+
+        return 0;
     }
 
     private void actionPerformed(boolean isSuccess) {

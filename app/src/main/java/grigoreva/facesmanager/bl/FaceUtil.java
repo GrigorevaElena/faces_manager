@@ -25,7 +25,7 @@ public class FaceUtil {
     private static final float MAX_DIFF_VALUE = 5.0f;
     private static final float MIN_DIFF_X = 2.0f;
     private static final float MIN_DIFF_Y = MIN_DIFF_X;
-    public static final int NORMAL_HEIGHT = 300;
+    public static final int NORMAL_HEIGHT = 500;
 
     public static List<PersonPhoto> parseFacesModelList(@Nullable SparseArray<Face> faces) {
         if (faces == null || faces.size() == 0) {
@@ -200,6 +200,18 @@ public class FaceUtil {
             diffValueX += p1.getNormPointX() - p2.getNormPointX();
             diffValueY += p1.getNormPointY() - p2.getNormPointY();
         }
+        p1 = landmarkList.get(LandmarkType.RIGHT_MOUTH);
+        p2 = landmarkList1.get(LandmarkType.RIGHT_MOUTH);
+        if (!comparePoint(p1, p2)) {
+            diffValueX += p1.getNormPointX() - p2.getNormPointX();
+            diffValueY += p1.getNormPointY() - p2.getNormPointY();
+        }
+        p1 = landmarkList.get(LandmarkType.LEFT_MOUTH);
+        p2 = landmarkList1.get(LandmarkType.LEFT_MOUTH);
+        if (!comparePoint(p1, p2)) {
+            diffValueX += p1.getNormPointX() - p2.getNormPointX();
+            diffValueY += p1.getNormPointY() - p2.getNormPointY();
+        }
         p1 = landmarkList.get(LandmarkType.LEFT_EYE);
         p2 = landmarkList1.get(LandmarkType.LEFT_EYE);
         if (!comparePoint(p1, p2)) {
@@ -230,7 +242,7 @@ public class FaceUtil {
             diffValueX += p1.getNormPointX() - p2.getNormPointX();
             diffValueY += p1.getNormPointY() - p2.getNormPointY();
         }
-        return diffValueX < MIN_DIFF_X && diffValueY < MIN_DIFF_Y;
+        return Math.abs((diffValueX + diffValueY) / 2) < MIN_DIFF_Y;
     }
 
     private static boolean comparePoint(@NonNull PhotoLandmark photoLandmark, @NonNull PhotoLandmark photoLandmark1) {
